@@ -1,0 +1,49 @@
+<div class="heading-map">
+  <header class="heading-map-header">
+    <h2>Page Heading Structure</h2>
+    <button (click)="refreshHeadings()" class="btn btn-secondary">
+      {{ isLoading() ? "Loading..." : "Refresh" }}
+    </button>
+  </header>
+
+  @if (error()) {
+    <div class="error-message">
+      <p>{{ error() }}</p>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading-message">
+      <p>Analyzing page headings...</p>
+    </div>
+  }
+
+  @if (!isLoading() && !error() && headings().length === 0) {
+    <div class="empty-state">
+      <p>No headings found on this page.</p>
+    </div>
+  }
+
+  @if (!isLoading() && !error() && headings().length > 0) {
+    <div class="headings-list">
+      @for (heading of headings(); track $index) {
+        <div class="heading-item" [class]="'heading-level-' + heading.level">
+          <div class="heading-indicator">
+            <span class="heading-level">H{{ heading.level }}</span>
+            @if (!heading.hasId) {
+              <span class="warning-icon" title="No ID attribute">⚠️</span>
+            }
+          </div>
+          <div class="heading-content">
+            <span class="heading-text">{{
+              heading.text || "(Empty heading)"
+            }}</span>
+            @if (heading.id) {
+              <span class="heading-id">#{{ heading.id }}</span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "A11y Events DevTools Extension",
+  "version": "1.0.0",
+  "description": "A Chrome DevTools extension for accessibility events monitoring",
+  "devtools_page": "devtools.html",
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["scripting", "activeTab"],
+  "host_permissions": ["<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content-script.js"],
+      "type": "module"
+    }
+  ],
+  "icons": {
+    "16": "favicon.ico",
+    "48": "favicon.ico",
+    "128": "favicon.ico"
+  }
+}
