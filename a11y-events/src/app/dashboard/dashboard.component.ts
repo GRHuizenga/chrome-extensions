@@ -61,31 +61,6 @@ import { HeadingMap } from '../heading-map/heading-map';
                   View Headings
                 </button>
               </div>
-
-              <div class="feature-card">
-                <h3>ARIA Landmarks</h3>
-                <p>
-                  Identify navigation landmarks and semantic regions on the
-                  page.
-                </p>
-                <button
-                  (click)="setActiveTab('landmarks')"
-                  class="feature-button"
-                >
-                  View Landmarks
-                </button>
-              </div>
-
-              <div class="feature-card">
-                <h3>Form Controls</h3>
-                <p>
-                  Check form elements for proper labeling and accessibility
-                  attributes.
-                </p>
-                <button (click)="setActiveTab('forms')" class="feature-button">
-                  View Form Controls
-                </button>
-              </div>
             </div>
           </div>
         </div>
@@ -289,8 +264,6 @@ export class DashboardComponent {
   protected tabs = [
     { id: 'overview', name: 'Overview' },
     { id: 'headings', name: 'Headings' },
-    { id: 'landmarks', name: 'Landmarks' },
-    { id: 'forms', name: 'Forms' },
   ];
 
   protected setActiveTab(tabId: string) {

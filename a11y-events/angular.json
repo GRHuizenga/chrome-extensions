@@ -71,6 +71,21 @@
           },
           "defaultConfiguration": "production"
         },
+        "build-content-script": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "src/app/content-script.ts",
+            "tsConfig": "tsconfig.app.json",
+            "outputPath": "dist/content-script",
+            "assets": [],
+            "styles": [],
+            "optimization": true,
+            "sourceMap": false,
+            "extractLicenses": false,
+            "namedChunks": false,
+            "outputHashing": "none"
+          }
+        },
         "serve": {
           "builder": "@angular/build:dev-server",
           "configurations": {

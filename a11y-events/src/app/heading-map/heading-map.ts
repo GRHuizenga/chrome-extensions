@@ -25,6 +25,7 @@ export class HeadingMap implements OnInit {
   protected async loadHeadings() {
     chrome.runtime.sendMessage({ data: 'GET_HEADINGS' }, (response) => {
       console.log('Response from content script in Angular app:', response);
+      this.headings.set(response.data || []);
     });
   }
 

@@ -4,7 +4,10 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build && npm run build:content-script && npm run copy:content-script",
+    "build:prod": "ng build --configuration production && npm run build:content-script && npm run copy:content-script",
+    "build:content-script": "ng run a11y-events:build-content-script",
+    "copy:content-script": "cp dist/content-script/browser/main.js dist/a11y-events/browser/content-script.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint"
