@@ -4,6 +4,7 @@ import {
   FormControlInfo,
   ImageInfo,
   ColorContrastIssue,
+  AriaLevelSatus,
 } from '../../types/messages';
 
 // Accessibility analyzer classes - shared between DevTools and Content Script
@@ -11,14 +12,67 @@ import {
 
 export class AccessibilityAnalyzer {
   static getHeadings(doc: Document): HeadingInfo[] {
-    const headings = Array.from(doc.querySelectorAll('h1, h2, h3, h4, h5, h6'));
+    // Include both native headings and role="heading" elements
+    const headings: HTMLElement[] = Array.from(
+      doc.querySelectorAll('h1, h2, h3, h4, h5, h6, [role="heading"]'),
+    );
 
-    return headings.map((heading) => ({
-      level: parseInt(heading.tagName.charAt(1)),
-      text: heading.textContent?.trim() || '',
-      id: heading.id || undefined,
-      hasId: Boolean(heading.id),
-    }));
+    return headings.reduce((acc, heading, index) => {
+      heading.setAttribute('data-a11y-heading-index', index.toString());
+      const isNative = /^H[1-6]$/.test(heading.tagName);
+      const text = heading.textContent?.trim() || '';
+      const level = isNative
+        ? parseInt(heading.tagName[1])
+        : parseInt(heading.getAttribute('aria-level') ?? '0');
+      return [
+        ...acc,
+        {
+          tagName: heading.tagName,
+          level,
+          text,
+          isNative,
+          ariaLevelStatus: isNative
+            ? AriaLevelSatus.Valid
+            : this.getAriaLevelStatus(heading.getAttribute('aria-level')),
+          isEmpty: text.length === 0,
+          nonDescriptive: text.length < 3,
+          levelSkipDetected: acc.length ? level > acc.at(-1)!.level + 1 : false,
+        },
+      ];
+    }, [] as HeadingInfo[]);
+  }
+
+  static highLight(doc: Document, index: number): void {
+    const heading: HTMLElement | null = doc.querySelector(
+      `[data-a11y-heading-index="${index}"]`,
+    );
+    if (heading) {
+      heading.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      heading.style.outlineColor = 'red';
+      heading.style.outlineStyle = 'solid';
+      heading.style.outlineWidth = '4px';
+      setTimeout(() => {
+        heading.style.outlineColor = '';
+        heading.style.outlineStyle = '';
+        heading.style.outlineWidth = '';
+      }, 5000);
+    }
+  }
+
+  private static getAriaLevelStatus(
+    ariaLevelAttribute: string | null,
+  ): AriaLevelSatus {
+    if (ariaLevelAttribute === null) {
+      return AriaLevelSatus.Missing;
+    }
+    const level = parseInt(ariaLevelAttribute);
+    if (isNaN(level)) {
+      return AriaLevelSatus.NaN;
+    }
+    if (level < 1) {
+      return AriaLevelSatus.TooLow;
+    }
+    return AriaLevelSatus.Valid;
   }
 
   static getLandmarks(doc: Document): LandmarkInfo[] {

@@ -1,16 +1,18 @@
 // Background script - message relay between DevTools and Content Script
+// leaving it for now, but as of yet i dont need it. direct communication
+// between devtools and content script works fine
 
-chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
-  console.log("Background script received message:", message);
-  chrome.tabs.query({ active: true }, ([tab]) => {
-    console.log("Active tab found:", tab);
-    chrome.tabs.sendMessage(tab.id, message, (response) => {
-      console.log("Response from content script:", response);
-      sendResponse(response);
-    });
-  });
-  return true;
-});
+// chrome.runtime.onMessage.addListener((message, _, sendResponse) => {
+//   console.log("Background script received message:", message);
+//   chrome.tabs.query({ active: true }, ([tab]) => {
+//     console.log("Active tab found:", tab);
+//     chrome.tabs.sendMessage(tab.id, message, (response) => {
+//       console.log("Response from content script:", response);
+//       sendResponse(response);
+//     });
+//   });
+//   return true;
+// });
 
 // chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 //   console.log("Background script received message:", message);

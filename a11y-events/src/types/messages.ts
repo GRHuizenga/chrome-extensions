@@ -25,10 +25,22 @@ export interface ContentScriptResponse<T = any> {
 
 // Data types for responses
 export interface HeadingInfo {
+  tagName: string;
   level: number;
   text: string;
-  id?: string;
-  hasId: boolean;
+  isNative: boolean;
+  // flags
+  ariaLevelStatus: AriaLevelSatus;
+  isEmpty: boolean;
+  nonDescriptive: boolean;
+  levelSkipDetected: boolean;
+}
+
+export enum AriaLevelSatus {
+  Valid = 'valid',
+  NaN = 'not a number',
+  TooLow = 'less than 1',
+  Missing = 'missing',
 }
 
 export interface LandmarkInfo {

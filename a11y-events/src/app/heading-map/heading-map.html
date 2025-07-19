@@ -2,48 +2,95 @@
   <header class="heading-map-header">
     <h2>Page Heading Structure</h2>
     <button (click)="refreshHeadings()" class="btn btn-secondary">
-      {{ isLoading() ? "Loading..." : "Refresh" }}
+      Refresh
     </button>
   </header>
 
-  @if (error()) {
-    <div class="error-message">
-      <p>{{ error() }}</p>
-    </div>
+  @if (missingH1() || multipleH1()) {
+    <ul class="global-error-list">
+      @if (missingH1()) {
+        <li class="global-error-item">
+          <p>No H1 element found on this page.</p>
+        </li>
+      }
+      @if (multipleH1()) {
+        <li class="global-error-item">
+          <p>Multiple H1 elements found on this page.</p>
+        </li>
+      }
+    </ul>
   }
 
-  @if (isLoading()) {
-    <div class="loading-message">
-      <p>Analyzing page headings...</p>
-    </div>
-  }
-
-  @if (!isLoading() && !error() && headings().length === 0) {
-    <div class="empty-state">
-      <p>No headings found on this page.</p>
-    </div>
-  }
-
-  @if (!isLoading() && !error() && headings().length > 0) {
-    <div class="headings-list">
+  @if (headings().length > 0) {
+    <ul class="headings-list">
       @for (heading of headings(); track $index) {
-        <div class="heading-item" [class]="'heading-level-' + heading.level">
+        <li
+          class="heading-item"
+          [class]="getHeadingClasses(heading)"
+          title="Click to highlight on page, Ctrl+Click to inspect in DevTools"
+          (click)="findElement($index, $event)"
+        >
           <div class="heading-indicator">
-            <span class="heading-level">H{{ heading.level }}</span>
-            @if (!heading.hasId) {
-              <span class="warning-icon" title="No ID attribute">⚠️</span>
-            }
+            <span class="heading-level" [class]="getHeadingLevelClass(heading)">
+              @if (heading.isNative) {
+                H{{ heading.level }}
+              } @else {
+                <span class="custom-heading-label">
+                  {{ heading.tagName }}
+                  <small>[role="heading"]</small>
+                </span>
+              }
+            </span>
           </div>
           <div class="heading-content">
             <span class="heading-text">{{
               heading.text || "(Empty heading)"
             }}</span>
-            @if (heading.id) {
-              <span class="heading-id">#{{ heading.id }}</span>
+          </div>
+          <div class="heading-issues">
+            <!-- Group critical errors first -->
+            @if (
+              !heading.isNative &&
+              heading.ariaLevelStatus !== AriaLevelSatus.Valid
+            ) {
+              <span class="badge badge-danger">
+                @switch (heading.ariaLevelStatus) {
+                  @case (AriaLevelSatus.Missing) {
+                    No aria-level
+                  }
+                  @case (AriaLevelSatus.NaN) {
+                    Invalid level
+                  }
+                  @case (AriaLevelSatus.TooLow) {
+                    Level < 1
+                  }
+                  @default {
+                    Bad level
+                  }
+                }
+              </span>
+            }
+
+            @if (heading.levelSkipDetected) {
+              <span class="badge badge-danger">Skip</span>
+            }
+
+            @if (heading.isEmpty) {
+              <span class="badge badge-danger">Empty</span>
+            }
+
+            <!-- Warnings -->
+            @if (heading.nonDescriptive) {
+              <span class="badge badge-warning">Short</span>
+            }
+
+            <!-- Info badges -->
+            @if (!heading.isNative && heading.level > 6) {
+              <span class="badge badge-info">L{{ heading.level }}</span>
             }
           </div>
-        </div>
+        </li>
       }
-    </div>
+    </ul>
   }
 </div>
